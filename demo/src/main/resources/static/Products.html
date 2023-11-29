@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Details Table</title>
+    <style>
+        #AddProduct {
+            margin-top: 10px;
+            margin-left: 940px;
+            background-color: aquamarine;
+        }
+        #closeButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        form {
+            max-width: 450px;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding-left: 15px;
+            width: 350px;
+            height: 200px;
+            background-image: linear-gradient(170deg, #fcfcfd 0%, rgb(90, 88, 216) 46%, #fcfbfb 100%);
+            border-radius: 8px;
+            color: rgb(5, 5, 5);
+            overflow: hidden;
+            margin-top: 50px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            margin: 10% auto;
+            padding: 20px;
+            width: 80%;
+            background-color: #fefefe;
+            border-radius: 8px;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        #popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        #Editpopup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        #openPopup {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .edit-button {
+            cursor: pointer;
+            color: rgb(14, 231, 119);
+            text-decoration: underline;
+        }
+
+        .Delete-button {
+            cursor: pointer;
+            color: rgb(228, 7, 7);
+            text-decoration: underline;
+        }
+        .popup-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Product Details Table</h2>
+
+    <table id="ProductDetailsTable">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Name</th>
+                <th>File Name</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- User details will be dynamically added here -->
+        </tbody>
+
+    </table>
+
+    <button id="AddProduct">Add Products</button>
+
+    <div id="popup">
+
+        <form id="addProductForm" class="card">
+            <div class="popup-content">
+                <span id="closeButton" onclick="closePopup()">&times;</span>
+            </div>
+            <center>
+                <!-- Product Name -->
+                <h2>Add Product</h2>
+            </center>
+            <label for="productName">Product Name:</label>
+            <input type="text" id="productName" name="productName" required><br>
+
+            <!-- Image Upload -->
+            <label for="imageUpload">Choose Image:</label>
+            <input type="file" id="imageUpload" name="imageUpload" accept="image/*" required><br><br>
+
+            <!-- Image Preview -->
+            <button type="button" onclick="closePopup()">Add Images</button>
+
+        </form>
+
+    </div>
+
+    <div id="Editpopup">
+
+        <form id="EditProductForm" class="card">
+            <center>
+                <!-- Product Name -->
+                <h2>Edit Product</h2>
+            </center>
+            <label for="editproductName">Product Name:</label>
+            <input type="text" id="editproductName" name="productName" required><br>
+
+            <!-- Image Upload -->
+            <label for="editimageUpload">Choose Image:</label>
+            <input type="file" id="imageUpload" name="imageUpload" accept="image/*" required><br><br>
+
+            <!-- Image Preview -->
+            <button type="button" onclick="editclosePopup()">Edit Images</button>
+
+        </form>
+
+    </div>
+
+    <script>
+        // Edit product 
+
+        // open popup to add products
+        document.getElementById('AddProduct').addEventListener('click', function () {
+            document.getElementById('popup').style.display = 'flex';
+        })
+
+        // Add Product and close popup
+        async function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+
+            var ImageForm = document.getElementById("addProductForm");
+            var imageDetails = {
+                name: ImageForm.elements.productName.value,
+                image: ImageForm.elements.imageUpload.files[0]
+            };
+
+            // Assuming you are using Fetch API to make a POST request to the register API
+            try {
+                const formdata = new FormData();
+                formdata.append('file', imageDetails.image);
+                formdata.append('name', imageDetails.name);
+                const response = fetch('/api/product/SaveProduct', {
+                    method: 'POST',
+                    body: formdata
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = "/products";
+                        } else {
+                            alert("product not uploaded");
+                        }
+                    })
+
+            } catch (error) {
+                alert(error);
+            }
+        }
+
+        // Fetch all Products
+        async function AllProduct() {
+            const response = await fetch('/api/product/all')
+
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+
+                    } else {
+                        console.log("error");
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                })
+                .then(data => {
+                    ProductList = data;
+                    console.log(ProductList);
+                    // Handle the userDetailsList as needed
+                    // Dynamically populate the table with user details
+                    ProductDetailsTable();
+                });
+            // alert("hii");
+        }
+
+        function ProductDetailsTable() {
+
+            var tableBody = document.querySelector('#ProductDetailsTable tbody');
+
+
+            // Check if ProductDetail is defined
+            if (ProductList) {
+                // Loop through the ProductDetail and dynamically create rows in the table
+                ProductList.forEach(function (ProductDetail) {
+                    var row = document.createElement('tr');
+
+                    // Loop through each property in ProductDetail and create cells in the row
+                    for (var key in ProductDetail) {
+                        var cell = document.createElement('td');
+                        cell.textContent = ProductDetail[key];
+                        row.appendChild(cell);
+                    }
+                    tableBody.appendChild(row);
+
+                    // Add an "Edit" button to the last cell
+                    var editCell = document.createElement('td');
+                    var editButton = document.createElement('span');
+                    editButton.textContent = 'Edit';
+                    editButton.className = 'edit-button';
+                    editButton.addEventListener('click', function () {
+                        navigateToUpdatePage(ProductDetail);
+                    });
+                    editCell.appendChild(editButton);
+                    row.appendChild(editCell);
+                    // Append the row to the table body
+
+                    //Delete
+                    var DeleteCell = document.createElement('td');
+                    var DeleteButton = document.createElement('span');
+                    DeleteButton.textContent = 'Delete';
+                    DeleteButton.className = 'Delete-button';
+                    DeleteButton.addEventListener('click', function () {
+                        navigate_To_Delete_Page(ProductDetail);
+                    });
+                    DeleteCell.appendChild(DeleteButton);
+                    row.appendChild(DeleteCell);
+
+                });
+            }
+        }
+
+        function navigateToUpdatePage(ProductDetails) {
+            // alert(ProductDetails.name);
+            document.getElementById('editproductName').value = ProductDetails.name;
+            document.getElementById('Editpopup').style.display = 'flex';
+        }
+
+
+        async function navigate_To_Delete_Page(ProductDetails) {
+            let DeleteId = ProductDetails.id;
+
+            const response = fetch(`api/product/DeleteProduct?deleteId=${DeleteId}`, { method: 'DELETE' }
+            )
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = "products";
+                    } else {
+                        console.log(response);
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Handle error, e.g., display an error message to the user
+                    alert('Failed to fetch users. Please try again.');
+                });
+        }
+
+        window.onload = AllProduct();
+    </script>
+    <p>edit and delete must be work in database and image store both side</p>
+    <p>product description and price must be show</p>
+</body>
+
+</html>

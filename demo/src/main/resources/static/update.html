@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    
+    <form id="updateForm">
+        <h2>Update User Details</h2>
+        <label for="id">ID:</label>
+        <input type="text" id="id" name="id" readonly>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" required>
+
+        <button type="submit">Update</button>
+    </form>
+
+   
+    <script>
+        // Retrieve user details JSON string from query parameters
+        var urlParams = new URLSearchParams(window.location.search);
+        var userDetailsString = urlParams.get('userDetails');
+
+        // Parse the JSON string into a JavaScript object
+        var userDetails = JSON.parse(decodeURIComponent(userDetailsString));
+
+        // Populate the form with user details
+        document.getElementById('id').value = userDetails.id;
+        document.getElementById('name').value = userDetails.name;
+        document.getElementById('email').value = userDetails.email;
+        document.getElementById('username').value = userDetails.username;
+        document.getElementById('password').value = userDetails.password;
+        document.getElementById('address').value = userDetails.address;
+
+        // Handle form submission
+        document.getElementById('updateForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    // Collect updated user details from the form
+    var updatedUserDetails = {
+        id: document.getElementById('id').value,
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value,
+        address: document.getElementById('address').value
+    };
+
+    // Perform the update logic (make a PUT request to the /updateUser API)
+    fetch('/api/updateUser', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedUserDetails)
+    })
+        .then(response => {
+            if (response.ok) {
+                return response;
+            } else {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        })
+        .then(data => {
+            // Handle the response as needed
+            console.log(data);
+            alert('User updated successfully');
+            window.location.href = "/user.html";
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle error, e.g., display an error message to the user
+            alert('Failed to update user. Please try again.');
+        });
+});
+
+    </script>
+
+</body>
+</html>

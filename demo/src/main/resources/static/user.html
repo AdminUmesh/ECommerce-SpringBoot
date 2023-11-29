@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details Table</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e4e3e3;
+        }
+
+        .edit-button {
+            cursor: pointer;
+            color: rgb(14, 231, 119);
+            text-decoration: underline;
+        }
+        .Delete-button {
+            cursor: pointer;
+            color: rgb(228, 7, 7);
+            text-decoration: underline;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <h2>User Details Table</h2>
+
+    <table id="userDetailsTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Address</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- User details will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <script>
+        var userDetailsList;
+
+        function fetchAllUsers() {
+            fetch('/api/getAllUser')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                })
+                .then(data => {
+                    // Assuming userDetailsList is a global array to store the fetched user details
+                    userDetailsList = data;
+
+                    // Handle the userDetailsList as needed
+                   
+
+                    // Dynamically populate the table with user details
+                    populateUserDetailsTable();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Handle error, e.g., display an error message to the user
+                    alert('Failed to fetch users. Please try again.');
+                });
+        }
+
+        function populateUserDetailsTable() {
+            var tableBody = document.querySelector('#userDetailsTable tbody');
+            
+            // Clear existing table rows
+            tableBody.innerHTML = '';
+            
+            // Check if userDetailsList is defined
+            if (userDetailsList) {
+                // Loop through the userDetailsList and dynamically create rows in the table
+                userDetailsList.forEach(function(userDetails) {
+                    var row = document.createElement('tr');
+                    
+                    // Loop through each property in userDetails and create cells in the row
+                    for (var key in userDetails) {
+                        var cell = document.createElement('td');
+                        cell.textContent = userDetails[key];
+                        row.appendChild(cell);
+                    }
+                    
+                    // Add an "Edit" button to the last cell
+                    var editCell = document.createElement('td');
+                    var editButton = document.createElement('span');
+                    editButton.textContent = 'Edit';
+                    editButton.className = 'edit-button';
+                    editButton.addEventListener('click', function() {
+                        navigateToUpdatePage(userDetails);
+                    });
+                    editCell.appendChild(editButton);
+                    row.appendChild(editCell);
+                    // Append the row to the table body
+                    tableBody.appendChild(row);
+
+                    //Delete
+                    var DeleteCell = document.createElement('td');
+                    var DeleteButton = document.createElement('span');
+                    DeleteButton.textContent = 'Delete';
+                    DeleteButton.className = 'Delete-button';
+                    DeleteButton.addEventListener('click', function() {
+                        navigate_To_Delete_Page(userDetails);
+                    });
+                    DeleteCell.appendChild(DeleteButton);
+                    row.appendChild(DeleteCell);
+                    
+                });
+            }
+        }
+
+        function navigateToUpdatePage(userDetails) {
+            // Encode the userDetails object as a JSON string
+            var userDetailsString = encodeURIComponent(JSON.stringify(userDetails));
+            // Create a URL with the userDetails object as a query parameter
+            var updatePageUrl = 'update.html?userDetails=' + userDetailsString;
+            // Navigate to the update page
+            window.location.href = updatePageUrl;
+        }
+        
+
+        function navigate_To_Delete_Page(userDetails) {
+            let DeleteId = userDetails.username;
+
+            fetch(`api/DeleteUser?username=${DeleteId}`, {method: 'DELETE',}
+            )
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = "/user";
+                    } else {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Handle error, e.g., display an error message to the user
+                    alert('Failed to fetch users. Please try again.');
+                });
+        }
+        
+
+        // Trigger the fetchAllUsers function when the window is loaded
+        window.onload = fetchAllUsers;
+    </script>
+<p>user type should be updated by admin in edit</p>
+<p>logout button</p>
+<p>add user button</p>
+</body>
+</html>

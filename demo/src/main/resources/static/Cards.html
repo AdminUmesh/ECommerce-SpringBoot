@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Cards</title>
+    <style>
+        .Main_Products_Body{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(15, 15, 15, 0.5);
+            border-radius: 8px;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .product-card {
+            /* width: auto; */
+            /* 25% width for each card with some margin */
+            max-width: 200px;
+            min-width: 200px;
+            margin: 15px;
+            background-color: #fcfafa;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .product-card:hover {
+            transform: scale(1.05);
+        }
+
+        .product-image {
+            width: 100%;
+            padding: auto;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="product_list" class="Main_Products_Body"></div>
+
+
+
+    <!-- Add more product cards as needed -->
+
+    <script>
+        async function AllProduct() {
+            const response = await fetch('/api/product/cards')
+
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+
+                    } else {
+                        console.log("error");
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                })
+                .then(data => {
+                    ShowCards(data)
+                    // Handle the userDetailsList as needed
+                    // Dynamically populate the table with user details
+                });
+            // alert("hii");
+        }
+
+        function ShowCards(data) {
+            if (data) {
+                const container = document.getElementById("product_list");
+                try {
+                    data.forEach(Productdata => {
+
+                        const cards = `<div class="product-card">
+                                    <img class="product-image" src="/api/product/image/${Productdata.imagePath}" alt="Product Image">
+                                    <div class="product-info">
+                                    <h3>Product 2</h3>
+                                    <p>"${Productdata.name}"</p>
+                                    <p>Price: $35.00</p>
+                                    </div>
+                                    </div>`;
+
+                        const tempContainer = document.createElement('div');
+
+                        // Set the innerHTML of the temporary container to the HTML string
+                        tempContainer.innerHTML = cards;
+                        container.appendChild(tempContainer);
+                    })
+
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+        }
+
+        window.onload = AllProduct;
+
+        
+    </script>
+    <p>add buy now button</p>
+    <p>price and product details should be dynamic</p>
+</body>
+
+</html>
